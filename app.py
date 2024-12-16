@@ -10,7 +10,8 @@ from elements import elements
 app = Flask(__name__)
 CORS(app)
 
-recent_elements = {}  # {date: element}
+recent_elements = {"20241216": {"name": 'Antimony', "atomicNumber": 51, "family": 'Metalloid',
+     "hint": 'Used in flame retardants and batteries.', "symbol": 'Sb'}}  # {date: element}
 
 
 def get_most_recent_date():
@@ -52,4 +53,4 @@ def home():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
