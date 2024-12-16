@@ -2,11 +2,13 @@ from flask import Flask, jsonify
 import datetime
 import random
 from pytz import timezone
+from flask_cors import CORS
 
 from elements import elements
 
 
 app = Flask(__name__)
+CORS(app)
 
 recent_elements = {}  # {date: element}
 
