@@ -8,7 +8,7 @@ from elements import elements
 
 
 app = Flask(__name__)
-cors = CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 recent_elements = {"20241216": {"name": 'Antimony', "atomicNumber": 51, "family": 'Metalloid',
      "hint": 'Used in flame retardants and batteries.', "symbol": 'Sb'}}  # {date: element}
