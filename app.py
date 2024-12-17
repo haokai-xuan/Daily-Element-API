@@ -2,13 +2,13 @@ from flask import Flask, jsonify
 import datetime
 import random
 from pytz import timezone
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 
 from elements import elements
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "https://elementlegame.com/"}})
+CORS(app)
 
 recent_elements = {"20241216": {"name": 'Antimony', "atomicNumber": 51, "family": 'Metalloid',
      "hint": 'Used in flame retardants and batteries.', "symbol": 'Sb'}}  # {date: element}
@@ -46,7 +46,6 @@ def update_recent_elements():
 
 
 @app.route('/')
-@cross_origin()
 def home():
     update_recent_elements()
 
