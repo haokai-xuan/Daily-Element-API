@@ -8,8 +8,7 @@ from elements import elements
 
 
 app = Flask(__name__)
-cors = CORS(app) # allow CORS for all domains on all routes.
-app.config['CORS_HEADERS'] = 'Content-Type'
+CORS(app, resources={r"/*": {"origins": "https://elementlegame.com/"}})
 
 recent_elements = {"20241216": {"name": 'Antimony', "atomicNumber": 51, "family": 'Metalloid',
      "hint": 'Used in flame retardants and batteries.', "symbol": 'Sb'}}  # {date: element}
