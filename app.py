@@ -3,6 +3,7 @@ import datetime
 import random
 from pytz import timezone
 from flask_cors import CORS
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from elements import elements
 
@@ -10,14 +11,16 @@ from elements import elements
 app = Flask(__name__)
 CORS(app)
 
-recent_elements = {"20241216": {"name": 'Antimony', "atomicNumber": 51, "family": 'Metalloid',
-     "hint": 'Used in flame retardants and batteries.', "symbol": 'Sb'}}  # {date: element}
+# {date: element}
+recent_elements = {"20241216":
+                   {"name": 'Antimony', "atomicNumber": 51, "family": 'Metalloid',
+                    "hint": 'Used in flame retardants and batteries.', "symbol": 'Sb'}}
 
 
 def get_most_recent_date():
     most_recent_zone = timezone('Pacific/Kiritimati')
     now = datetime.datetime.now(most_recent_zone)
-    print(now)
+
     return now.strftime('%Y%m%d')  # ISO format (YYYYMMDD)
 
 
@@ -43,6 +46,11 @@ def update_recent_elements():
     if len(recent_elements) > 80:
         oldest_date = min(recent_elements.keys())
         del recent_elements[oldest_date]
+
+
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(update_recent_elements, 'cron', hour=0, minute=0, timezone=timezone("Pacific/Kiritimati"))
+sched.start()
 
 
 @app.route('/')
