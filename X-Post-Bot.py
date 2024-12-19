@@ -1,6 +1,10 @@
 import tweepy
 from datetime import datetime, timezone
 from app import guess_distribution, recent_elements
+import os
+
+current_directory = os.path.dirname(os.path.abspath(__file__))
+images_folder = os.path.join(current_directory, 'images')
 
 # Enter API tokens below
 BEARER_TOKEN = "AAAAAAAAAAAAAAAAAAAAAGhmwwEAAAAAAPWUcJtWjU7LbBPFAJw2LF9FroU%3D1hcGjWrBUTPC222te3VrVZB5i4klkyRLU84ISCIM3jYO3WrDWz"
@@ -28,18 +32,21 @@ def generate_distribution(date):
 
     total_count = 0
     for i in range(1, 10):
-        total_count += distribution[i]
+        total_count += distribution[str(i)]
 
     formatted_distribution = ""
 
     for i in range(1, 9):
-        count = distribution[i]
+        count = distribution[str(i)]
         percentage = round(((count / total_count) * 100)) if total_count else 0
-        formatted_distribution += f"{pos[i]} {'🟩' * min(5, max(1,  round((percentage / 100) * 5)))} {percentage}%\n"
+        formatted_distribution += f"{pos[i]} {
+            '🟩' * min(5, max(1,  round((percentage / 100) * 5)))} {percentage}%\n"
 
     failed_count = distribution[9]
-    failed_percentage = round(((failed_count / total_count) * 100)) if total_count else 0
-    formatted_distribution += f"❌ {'🟩' * min(5, max(1,  round((failed_percentage / 100) * 5)))} {failed_percentage}%"
+    failed_percentage = round(
+        ((failed_count / total_count) * 100)) if total_count else 0
+    formatted_distribution += f"❌ {'🟩' * min(
+        5, max(1,  round((failed_percentage / 100) * 5)))} {failed_percentage}%"
 
     return formatted_distribution
 
@@ -55,7 +62,7 @@ def post_tweet():
 
     if mystery_element:
         # Construct the full file path for the image
-        image_path = f"/home/Haokai/Daily-Element-API/images/{mystery_element}.jpg"
+        image_path = os.path.join(images_folder, f"{mystery_element}.jpg")
 
         # Compose the message
         message = f"Yesterday's #Elementle was {mystery_element} 🧪\n\n{distribution_text}\n\nhttps://elementlegame.com"
