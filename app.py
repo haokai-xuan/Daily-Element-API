@@ -20,11 +20,14 @@ recent_elements = {"20241218":
 guess_distribution = {}
 
 
+# We will run this slightly before new day to ensure smoothness, hence the timedelta
 def get_most_recent_date():
     most_recent_zone = timezone('Pacific/Kiritimati')
     now = datetime.datetime.now(most_recent_zone)
 
-    return now.strftime('%Y%m%d')  # ISO format (YYYYMMDD)
+    next_day = now + datetime.timedelta(days=1)
+
+    return next_day.strftime('%Y%m%d')  # ISO format (YYYYMMDD)
 
 
 # Elements
