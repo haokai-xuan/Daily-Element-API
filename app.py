@@ -4,6 +4,7 @@ import random
 from pytz import timezone
 from flask_cors import CORS
 import json
+import os
 
 from elements import elements
 
@@ -11,8 +12,14 @@ from elements import elements
 app = Flask(__name__)
 CORS(app)
 
+current_directory = os.path.dirname(os.path.abspath(__file__))
+recent_elements_path = os.path.join(current_directory, 'recent_elements.json')
+guess_distribution_path = os.path.join(
+    current_directory, 'guess_distribution.json')
 
 # We will run this slightly before new day to ensure smoothness, hence the timedelta
+
+
 def get_most_recent_date():
     most_recent_zone = timezone('Pacific/Kiritimati')
     now = datetime.datetime.now(most_recent_zone)
@@ -24,13 +31,13 @@ def get_most_recent_date():
 
 # Elements
 def save_recent_elements():
-    with open('recent_elements.json', 'w') as file:
+    with open(recent_elements_path, 'w') as file:
         json.dump(recent_elements, file, indent=4)
 
 
 def load_recent_elements():
     try:
-        with open('recent_elements.json', 'r') as file:
+        with open(recent_elements_path, 'r') as file:
             return json.load(file)
     except FileNotFoundError:
         return {}
@@ -72,14 +79,14 @@ def update_recent_elements():
 # Guess distribution
 def load_guess_distribution():
     try:
-        with open('guess_distribution.json', 'r') as file:
+        with open(guess_distribution_path, 'r') as file:
             return json.load(file)
     except FileNotFoundError:
         return {}
 
 
 def save_guess_distribution():
-    with open('guess_distribution.json', 'w') as file:
+    with open(guess_distribution_path, 'w') as file:
         json.dump(guess_distribution, file)
 
 
