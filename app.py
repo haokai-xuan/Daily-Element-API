@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import datetime
 import random
 from pytz import timezone
@@ -14,6 +14,9 @@ CORS(app)
 recent_elements = {"20241218":
                    {"name": 'Astatine', "atomicNumber": 85, "family": 'Halogen',
                     "hint": 'Radioactive and extremely rare in nature.', "symbol": 'At'}}
+
+# {date: distribution}
+guess_distribution = {}
 
 
 def get_most_recent_date():
@@ -47,6 +50,29 @@ def update_recent_elements():
     if len(recent_elements) > 80:
         oldest_date = min(recent_elements.keys())
         del recent_elements[oldest_date]
+
+
+@app.route('/guess_distribution', methods=['POST', 'GET'])
+def distribution():
+    if request.method == 'POST':
+        data = request.get_json()
+        local_date = data['localDate']
+        guesses = data['guesses']
+
+        if local_date not in guess_distribution:
+            guess_distribution[local_date] = {i: 0 for i in range(1, 8)}
+            guess_distribution[local_date][9] = 0  # Num of failed attempts
+
+        guess_distribution[local_date][guesses] += 1
+
+        if len(guess_distribution) > 3:
+            oldest_date = min(guess_distribution.keys())
+            del recent_elements[oldest_date]
+
+        return jsonify(guess_distribution)
+
+    elif request.method == 'GET':
+        return jsonify(guess_distribution)
 
 
 @app.route('/')
