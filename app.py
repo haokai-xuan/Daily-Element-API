@@ -63,7 +63,6 @@ def distribution():
         if local_date not in guess_distribution:
             guess_distribution[local_date] = {i: 0 for i in range(1, 9)}
             guess_distribution[local_date][9] = 0  # Num of failed attempts
-            guess_distribution[local_date][10] = element  # Mystery element
 
         guess_distribution[local_date][guesses] += 1
 
