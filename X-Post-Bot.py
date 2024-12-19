@@ -35,6 +35,8 @@ def generate_distribution(date):
     for i in range(1, 10):
         total_count += distribution[str(i)]
 
+    total_count = total_count if total_count is not 0 else 1
+
     formatted_distribution = ""
 
     for i in range(1, 9):
