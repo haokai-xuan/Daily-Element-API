@@ -125,6 +125,8 @@ def distribution():
 # Home
 @app.route('/', methods=['GET'])
 def home():
+    global recent_elements
+    recent_elements = load_recent_elements()
     return jsonify(recent_elements)
 
 
