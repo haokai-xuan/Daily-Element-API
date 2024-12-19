@@ -11,14 +11,6 @@ from elements import elements
 app = Flask(__name__)
 CORS(app)
 
-# {date: element}
-recent_elements = {"20241218":
-                   {"name": 'Astatine', "atomicNumber": 85, "family": 'Halogen',
-                    "hint": 'Radioactive and extremely rare in nature.', "symbol": 'At'}}
-
-# {"date": {Str: Num, Str: Num}}
-guess_distribution = {}
-
 
 # We will run this slightly before new day to ensure smoothness, hence the timedelta
 def get_most_recent_date():
@@ -42,6 +34,10 @@ def load_recent_elements():
             return json.load(file)
     except FileNotFoundError:
         return {}
+
+
+# {date: element}
+recent_elements = load_recent_elements()
 
 
 def update_recent_elements():
@@ -87,6 +83,10 @@ def save_guess_distribution():
         json.dump(guess_distribution, file)
 
 
+# {"date": {Str: Num, Str: Num}}
+guess_distribution = load_guess_distribution()
+
+
 @app.route('/guess_distribution', methods=['POST', 'GET'])
 def distribution():
     global guess_distribution
@@ -118,8 +118,6 @@ def distribution():
 # Home
 @app.route('/', methods=['GET'])
 def home():
-    update_recent_elements()
-
     return jsonify(recent_elements)
 
 
