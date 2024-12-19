@@ -2,6 +2,7 @@ import tweepy
 from datetime import datetime, timezone, timedelta
 from app import guess_distribution, recent_elements
 import os
+import math
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 images_folder = os.path.join(current_directory, 'images')
@@ -39,12 +40,12 @@ def generate_distribution(date):
     for i in range(1, 9):
         count = distribution[str(i)]
         percentage = round(((count / total_count) * 100)) if total_count else 0
-        formatted_distribution += f"{pos[i]} {'🟩' * min(5, max(1,  round((percentage / 100) * 5)))} {percentage}%\n"
+        formatted_distribution += f"{pos[i]} {'🟩' * min(5, max(1,  math.floor(percentage / 20) + 1))} {percentage}%\n"
 
     failed_count = distribution["9"]
     failed_percentage = round(
         ((failed_count / total_count) * 100)) if total_count else 0
-    formatted_distribution += f"❌ {'🟩' * min(5, max(1,  round((failed_percentage / 100) * 5)))} {failed_percentage}%"
+    formatted_distribution += f"❌ {'🟩' * min(5, max(1,  math.floor(failed_percentage / 20) + 1))} {failed_percentage}%"
 
     return formatted_distribution
 
