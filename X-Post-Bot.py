@@ -39,14 +39,12 @@ def generate_distribution(date):
     for i in range(1, 9):
         count = distribution[str(i)]
         percentage = round(((count / total_count) * 100)) if total_count else 0
-        formatted_distribution += f"{pos[i]} {
-            '🟩' * min(5, max(1,  round((percentage / 100) * 5)))} {percentage}%\n"
+        formatted_distribution += f"{pos[i]} {'🟩' * min(5, max(1,  round((percentage / 100) * 5)))} {percentage}%\n"
 
     failed_count = distribution[9]
     failed_percentage = round(
         ((failed_count / total_count) * 100)) if total_count else 0
-    formatted_distribution += f"❌ {'🟩' * min(
-        5, max(1,  round((failed_percentage / 100) * 5)))} {failed_percentage}%"
+    formatted_distribution += f"❌ {'🟩' * min(5, max(1,  round((failed_percentage / 100) * 5)))} {failed_percentage}%"
 
     return formatted_distribution
 
