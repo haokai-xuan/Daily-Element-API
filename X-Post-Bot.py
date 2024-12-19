@@ -1,5 +1,5 @@
 import tweepy
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from app import guess_distribution, recent_elements
 import os
 
@@ -53,12 +53,13 @@ def generate_distribution(date):
 
 def post_tweet():
     today = datetime.now(timezone.utc)
-    today_formatted = today.strftime('%Y%m%d')
-    yesterday = str(int(today_formatted) - 1)
+    yesterday = today - timedelta(days=1)
+    yesterday_formatted = yesterday.strftime('%Y%m%d')
 
-    mystery_element = recent_elements[yesterday]["name"]
 
-    distribution_text = generate_distribution(yesterday)
+    mystery_element = recent_elements[yesterday_formatted]["name"]
+
+    distribution_text = generate_distribution(yesterday_formatted)
 
     if mystery_element:
         # Construct the full file path for the image
