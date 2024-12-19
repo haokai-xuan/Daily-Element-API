@@ -5,5 +5,12 @@
     "family": "Halogen",
     "hint": "Radioactive and extremely rare in nature.",
     "symbol": "At"
+  },
+  "20241219": {
+    "name": "Neptunium",
+    "atomicNumber": 93,
+    "family": "Actinide",
+    "hint": "Synthetic radioactive element, used in nuclear research and fuel.",
+    "symbol": "Np"
   }
 }
