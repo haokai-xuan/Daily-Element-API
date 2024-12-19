@@ -1,18 +1,6 @@
 import tweepy
-import json
-import time
-import random
-import pytz
-from datetime import datetime, timedelta
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-
-# Timezone setup
-TIMEZONE = pytz.UTC
-
+from datetime import datetime, timezone
+from app import guess_distribution, recent_elements
 
 # Enter API tokens below
 BEARER_TOKEN = "AAAAAAAAAAAAAAAAAAAAAGhmwwEAAAAAAPWUcJtWjU7LbBPFAJw2LF9FroU%3D1hcGjWrBUTPC222te3VrVZB5i4klkyRLU84ISCIM3jYO3WrDWz"
@@ -32,117 +20,45 @@ client = tweepy.Client(
     access_token=ACCESS_TOKEN, access_token_secret=ACCESS_TOKEN_SECRET, wait_on_rate_limit=True,
 )
 
-# Set up Chrome options for Selenium
-chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--proxy-server='direct://'")
-chrome_options.add_argument("--proxy-bypass-list=*")
-driver = webdriver.Chrome(options=chrome_options)
+pos = ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣"]
 
 
-def get_mystery_element():
-    try:
-        driver.get("https://elementlegame.com/")
-        print("On site", flush=True)
+def generate_distribution(date):
+    distribution = guess_distribution[date]
 
-        # Wait until the page has loaded completely
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.TAG_NAME, 'body'))
-        )
+    total_count = 0
+    for i in range(1, 10):
+        total_count += distribution[i]
 
-        # Access the localStorage item
-        mystery_element = driver.execute_script(
-            'return window.localStorage.getItem("mysteryElement");'
-        )
-        print("Got element:", mystery_element, flush=True)
+    formatted_distribution = ""
 
-        return mystery_element
+    for i in range(1, 9):
+        count = distribution[i]
+        percentage = round(((count / total_count) * 100)) if total_count else 0
+        formatted_distribution += f"{pos[i]} {'🟩' * min(5, max(1,  round((percentage / 100) * 5)))} {percentage}%\n"
 
-    except Exception as e:
-        print(f"Error retrieving mystery element: {e}", flush=True)
-        return None
-
-
-def save_mystery_element():
-    print("Running save_mystery_element function", flush=True)
-
-    mystery_element = get_mystery_element()
-
-    if mystery_element:
-        # Specify the full path to the file
-        file_path = "/home/Haokai/Elementle-Post-Bot/X-Bot-Elementle/mystery_element.txt"
-
-        with open(file_path, "w") as file:
-            file.write(mystery_element)
-        print("Saved mystery element for the day", flush=True)
-    else:
-        print("Could not retrieve the mystery element.", flush=True)
-
-
-def load_previous_mystery_element():
-    try:
-        # Specify the full path to the file
-        file_path = "/home/Haokai/Elementle-Post-Bot/X-Bot-Elementle/mystery_element.txt"
-
-        with open(file_path, "r") as file:
-            data = json.load(file)  # Load JSON from file
-
-        # Access the value with the key "name" if it exists
-        return data.get('name')
-
-    except FileNotFoundError:
-        print("File not found.", flush=True)
-        return None
-    except json.JSONDecodeError:
-        print("Error decoding JSON.", flush=True)
-        return None
-    except Exception as e:
-        print(f"Error loading mystery element: {e}", flush=True)
-        return None
-
-
-
-def generate_random_distribution():
-    bins = [1] * 9
-    remaining = 91
-    weights = [0.1, 0.3, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 0.6]
-
-    for _ in range(remaining):
-        selected_bin = random.choices(range(9), weights=weights, k=1)[0]
-        bins[selected_bin] += 1
-
-    formatted_distribution = f"""
-    1️⃣  {'🟩' * max(1, bins[0] // 5)} {bins[0]}%
-    2️⃣  {'🟩' * max(1, bins[1] // 5)} {bins[1]}%
-    3️⃣  {'🟩' * max(1, bins[2] // 5)} {bins[2]}%
-    4️⃣  {'🟩' * max(1, bins[3] // 5)} {bins[3]}%
-    5️⃣  {'🟩' * max(1, bins[4] // 5)} {bins[4]}%
-    6️⃣  {'🟩' * max(1, bins[5] // 5)} {bins[5]}%
-    7️⃣  {'🟩' * max(1, bins[6] // 5)} {bins[6]}%
-    8️⃣  {'🟩' * max(1, bins[7] // 5)} {bins[7]}%
-    ❌  {'🟩' * max(1, bins[8] // 5)} {bins[8]}%
-    """
+    failed_count = distribution[9]
+    failed_percentage = round(((failed_count / total_count) * 100)) if total_count else 0
+    formatted_distribution += f"❌ {'🟩' * min(5, max(1,  round((failed_percentage / 100) * 5)))} {failed_percentage}%"
 
     return formatted_distribution
 
 
 def post_tweet():
-    mystery_element = load_previous_mystery_element()
-    today = datetime.now(TIMEZONE)
-    yesterday = today - timedelta(days=1)
-    yesterday_formatted = yesterday.strftime('%Y-%m-%d')
+    today = datetime.now(timezone.utc)
+    today_formatted = today.strftime('%Y%m%d')
+    yesterday = str(int(today_formatted) - 1)
 
-    distribution_text = generate_random_distribution()
+    mystery_element = recent_elements[yesterday]["name"]
+
+    distribution_text = generate_distribution(yesterday)
 
     if mystery_element:
         # Construct the full file path for the image
-        image_path = f"/home/Haokai/Elementle-Post-Bot/X-Bot-Elementle/{mystery_element}.jpg"
+        image_path = f"/home/Haokai/Daily-Element-API/images/{mystery_element}.jpg"
 
         # Compose the message
-        message = f"Yesterday's #Elementle was {mystery_element} 🧪\n\n{distribution_text}\n\nhttps://elementlegame.com\nDate: {yesterday_formatted}"
+        message = f"Yesterday's #Elementle was {mystery_element} 🧪\n\n{distribution_text}\n\nhttps://elementlegame.com"
 
         try:
             # Upload the image and create the tweet
@@ -155,14 +71,4 @@ def post_tweet():
         print("Could not load the mystery element.", flush=True)
 
 
-
-while True:
-    now = datetime.now(TIMEZONE)
-    if now.hour == 23 and now.minute == 58:
-        save_mystery_element()
-        time.sleep(120)
-    elif now.hour == 10 and now.minute == 0:
-        post_tweet()
-        time.sleep(120)
-    else:
-        time.sleep(30)
+post_tweet()
