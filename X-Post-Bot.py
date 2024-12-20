@@ -55,11 +55,9 @@ def generate_distribution(date):
 
     for i in range(1, 10):
         if i == 9:
-            formatted_distribution += f"❌ {'🟩' * squares[i - 1]} {
-                round((guesses[i - 1] / total_count) * 100)}%"
+            formatted_distribution += f"❌ {'🟩' * squares[i - 1]} {round((guesses[i - 1] / total_count) * 100)}%"
         else:
-            formatted_distribution += f"{pos[i]} {'🟩' *
-                                                  squares[i - 1]} {round((guesses[i - 1] / total_count) * 100)}%\n"
+            formatted_distribution += f"{pos[i]} {'🟩' * squares[i - 1]} {round((guesses[i - 1] / total_count) * 100)}%\n"
 
     return formatted_distribution
 
