@@ -28,6 +28,13 @@ client = tweepy.Client(
 pos = ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣"]
 
 
+def calculate_squares(guesses, max_squares):
+    max_guess = max(guesses)
+    squares = [max(1, math.ceil((guess / max_guess) * max_squares))
+               for guess in guesses]
+    return squares
+
+
 def generate_distribution(date):
     if date not in guess_distribution:
         return "\n".join([f"{pos[i]} {'🟩'} 0%" for i in range(1, 9)]) + f"\n❌ {'🟩'} 0%"
@@ -42,15 +49,17 @@ def generate_distribution(date):
 
     formatted_distribution = ""
 
-    for i in range(1, 9):
-        count = distribution[str(i)]
-        percentage = round(((count / total_count) * 100)) if total_count else 0
-        formatted_distribution += f"{pos[i]} {'🟩' * min(5, max(1,  math.floor(percentage / 20) + 1))} {percentage}%\n"
+    guesses = list(distribution.values())
 
-    failed_count = distribution["9"]
-    failed_percentage = round(
-        ((failed_count / total_count) * 100)) if total_count else 0
-    formatted_distribution += f"❌ {'🟩' * min(5, max(1,  math.floor(failed_percentage / 20) + 1))} {failed_percentage}%"
+    squares = calculate_squares(guesses, 5)
+
+    for i in range(1, 10):
+        if i == 9:
+            formatted_distribution += f"❌ {'🟩' * squares[i - 1]} {
+                round((guesses[i - 1] / total_count) * 100)}%"
+        else:
+            formatted_distribution += f"{pos[i]} {'🟩' *
+                                                  squares[i - 1]} {round((guesses[i - 1] / total_count) * 100)}%\n"
 
     return formatted_distribution
 
@@ -59,7 +68,6 @@ def post_tweet():
     today = datetime.now(timezone.utc)
     yesterday = today - timedelta(days=1)
     yesterday_formatted = yesterday.strftime('%Y%m%d')
-
 
     mystery_element = recent_elements[yesterday_formatted]["name"]
 
