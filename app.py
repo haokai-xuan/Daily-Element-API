@@ -112,7 +112,7 @@ def distribution():
 
         if len(guess_distribution) > 3:
             oldest_date = min(guess_distribution.keys())
-            del recent_elements[oldest_date]
+            del guess_distribution[oldest_date]
 
         save_guess_distribution()
 
