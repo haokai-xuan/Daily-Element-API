@@ -60,12 +60,16 @@ def update_recent_elements():
     random.seed(seed)
 
     mystery_element = random.choice(elements)
+    mystery_element_name = mystery_element['name']
+
+    recent_elements_names = [element['name'] for element in recent_elements.values()]
 
     # Ensure no repeats within an 80-day time frame
-    while mystery_element in recent_elements.values():
+    while mystery_element_name in recent_elements_names:
         seed -= 100000
         random.seed(seed)
         mystery_element = random.choice(elements)
+        mystery_element_name = mystery_element['name']
 
     recent_elements[current_date] = mystery_element
 
